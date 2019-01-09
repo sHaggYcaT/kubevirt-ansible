@@ -135,6 +135,7 @@ func RemoveDataVolume(dvName string, namespace string) {
 	Expect(err).ToNot(HaveOccurred())
 	err = virtCli.CdiClient().CdiV1alpha1().DataVolumes(namespace).Delete(dvName, nil)
 	Expect(err).ToNot(HaveOccurred())
+}
 
 func GetLatestGitHubReleaseURL(user_name string, repo_name string) string {
 	github_api_address := "https://api.github.com/repos/" + user_name + "/" + repo_name + "/releases/latest"
@@ -147,7 +148,6 @@ func DownloadFile(file_url string) []byte {
 	response, err := http.Get(file_url)
 	ktests.PanicOnError(err)
 	defer response.Body.Close()
-
 	data, err := ioutil.ReadAll(response.Body)
 	ktests.PanicOnError(err)
 	return data
