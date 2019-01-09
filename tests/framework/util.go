@@ -7,6 +7,8 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+        "os/exec"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -133,4 +135,20 @@ func RemoveDataVolume(dvName string, namespace string) {
 	Expect(err).ToNot(HaveOccurred())
 	err = virtCli.CdiClient().CdiV1alpha1().DataVolumes(namespace).Delete(dvName, nil)
 	Expect(err).ToNot(HaveOccurred())
+
+func GetLatestGitHubReleaseURL(user_name string, repo_name string) string {
+	github_api_address := "https://api.github.com/repos/" + user_name + "/" + repo_name + "/releases/latest"
+	url_byte, err := exec.Command("/bin/bash", "-c", "curl -s " + github_api_address + " | grep browser_download_url | cut -d '\"' -f 4").Output()
+	ktests.PanicOnError(err)
+	return string(url_byte)
+}
+
+func DownloadFile(file_url string) []byte {
+	response, err := http.Get(file_url)
+	ktests.PanicOnError(err)
+	defer response.Body.Close()
+
+	data, err := ioutil.ReadAll(response.Body)
+	ktests.PanicOnError(err)
+	return data
 }
